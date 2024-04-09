@@ -227,7 +227,7 @@ const SignUp = () => {
                           ))}
                         </select>
                       </div>
-                     
+                    
 
                       <CustomValidationErrorMessage
                         show={
