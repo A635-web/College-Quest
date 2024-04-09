@@ -5,7 +5,7 @@ const connection = async () => {
 	try {
 		await mongoose.connect(
 			process.env.MONGO_DB_URL ||
-				'mongodb+srv://adi2004dixit:fDR7R4ejI4jQeMtP@cluster0.rgjskjl.mongodb.net/users1'
+				'mongodb://localhost:27017/collegeSell'
 		)
 		logger('DB Connected Successfully', 'SERVER')
 	} catch (err) {

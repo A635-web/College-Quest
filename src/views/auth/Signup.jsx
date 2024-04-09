@@ -227,26 +227,7 @@ const SignUp = () => {
                           ))}
                         </select>
                       </div>
-                      <div className="bg-gray-100 text-secondary flex gap-3 items-center px-3 rounded-lg my-5 shadow-lg">
-                        <PencilIcon className="w-4 h-4" />
-                        <select
-                          id="examTYpe"
-                          className="p-2.5 text-lg rounded-lg bg-gray-100 w-full focus:outline-none"
-                          name="examType"
-                          value={values.examType}
-                          onChange={handleChange}
-                        >
-                          <option value={0} disabled>
-                            Select Role
-                          </option>
-                          {[
-                           '1','2'
-                          ].map((val) => (
-                            <option value={val}>{val}</option>
-                          ))}
-                        </select>
-                      </div>
-
+                     
 
                       <CustomValidationErrorMessage
                         show={
