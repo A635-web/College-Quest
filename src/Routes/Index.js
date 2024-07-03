@@ -26,7 +26,7 @@ const MainPage = lazy(() => import("../views/dashboardPages/HomePage"))
 const DashboardProfile = lazy(() => import("../views/dashboardPages/Profile"))
 const DashboardUpdates = lazy(() => import("../views/dashboardPages/UpdatesPage"))
 const DashboardAbout = lazy(() => import("../views/dashboardPages/About"))
-
+const Clubpage=lazy(()=>import("../components/common/clubPage.jsx"));
 
 const router = createBrowserRouter([
     {
@@ -36,6 +36,11 @@ const router = createBrowserRouter([
     {
         path: "/clubs",
         element: <Clubs />,
+     
+    },
+    {
+         path:"/clubs/clubpage",
+         element:<Clubpage/>
     },
     {
         path: "/socities",

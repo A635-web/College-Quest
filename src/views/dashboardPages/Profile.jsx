@@ -19,7 +19,7 @@ const editProfileValidation = Yup.object({});
 const Profile = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user);
-
+  //  console.log(user);
   const [edit, setEdit] = useState(false);
   const [img, setImg] = useState([]);
   const [src, setSrc] = useState(null);

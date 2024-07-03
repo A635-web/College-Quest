@@ -70,11 +70,22 @@ const userSchema = new mongoose.Schema(
 			type: String
 		},
 		role: {
-			type: Number,
-			default:1,
+			type: String,
+			default:"student",
+			trim:true,
+			
 		
 
 		},
+		registeredEvent: {
+            type: String, 
+            trim: true
+        },
+		// branch:{
+        // type:String,
+		// required:true,
+		// trim:true
+		// }
 	},
 	{ timestamps: true }
 )
