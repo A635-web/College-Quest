@@ -5,7 +5,7 @@ import img_1 from "../../assets/images/hostels.jpg";
 import Header from "../shared/Header";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-
+import Faq from "../Core/Faq.jsx";
 const App = () => {
   useEffect(() => {
     AOS.init({ duration: 1200, delay: 500 });
@@ -154,6 +154,12 @@ const App = () => {
             </div>
           </div>
         </section>
+        {/* <section className="our-achievements mx-16 mt-12 mb-16">
+         
+        <div>
+          <Faq/>
+        </div>
+        </section> */}
         <section className="bg-green-800 py-12 px-16">
           <h1 className="text-green-50 font-bold text-4xl mb-2 text-center">
             Join our monthly newsletter!

@@ -12,7 +12,7 @@ import robotics from "../../assets/images/clubs.jpg";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Shimmer from "../../components/common/shimmer.jsx"
-
+import Faq from "../../components/Core/Faq.jsx";
 const DashboardComponent = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state?.user);
@@ -113,8 +113,17 @@ const DashboardComponent = () => {
                 </div>
               </>
             )}
+            
           </div>
         </div>
+        <section className="our-achievements mx-16 mt-12 mb-16">
+         
+         <div>
+           <Faq/>
+         </div>
+         </section>
+
+
         <Footer />
       </div>
     </div>

@@ -32,6 +32,7 @@ const signup = async (req, res) => {
 			}
 
 			const user = new userModel(req.body)
+			console.log(user);
 			user.save().then(user => {
 				const expiryTime = new Date()
 				expiryTime.setMonth(expiryTime.getMonth() + 6)

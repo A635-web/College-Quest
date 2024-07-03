@@ -39,6 +39,9 @@ const signUpalidation = Yup.object({
   examType: Yup.number()
     .min(1, "Please Select a value")
     .required("Exam Type field is required"),
+    // branch:Yup.string()
+    // .email("Not added branch")
+    // .required(" Branch field is required"),
 });
 
 const SignUp = () => {
@@ -117,6 +120,7 @@ const SignUp = () => {
                 email: "",
                 password: "",
                 examType: 0,
+                // branch:"",
                 consent: false,
               }}
               validationSchema={signUpalidation}
@@ -207,6 +211,31 @@ const SignUp = () => {
                         }
                         error={errors.password}
                       />
+                      {/* <div className="bg-gray-100 text-secondary flex gap-3 items-center px-3 rounded-lg my-5 shadow-lg">
+                        <PencilIcon className="w-4 h-4" />
+                        <select
+                          id="branch"
+                          className="p-2.5 text-lg rounded-lg bg-gray-100 w-full focus:outline-none"
+                          name="branch"
+                          value={values.branch}
+                          onChange={handleChange}
+                        >
+                          <option value={0} disabled>
+                            Select Branch
+                          </option>
+                          {[
+                             "Computer Science and Engineering",
+                             "Electronic and Communication Engineering",
+                             "Electrical Engineering",
+                             "Mechanical Engineering",
+                             "Civil Engineering",
+                             "Biotech Engineering",
+                             "Production and Industrial Engineering"
+                          ].map((val) => (
+                            <option value={val}>{val}</option>
+                          ))}
+                        </select>
+                      </div> */}
                       <div className="bg-gray-100 text-secondary flex gap-3 items-center px-3 rounded-lg my-5 shadow-lg">
                         <PencilIcon className="w-4 h-4" />
                         <select
@@ -227,7 +256,6 @@ const SignUp = () => {
                           ))}
                         </select>
                       </div>
-                    
 
                       <CustomValidationErrorMessage
                         show={

@@ -11,7 +11,7 @@ import ExploreMore from  "../../components/Core/ExploreMore";
 import TimelineSection from  "../../components/Core/TimelineSection";
 import InstructorSection from  "../../components/Core/InstructorSection";
 import LearningLanguageSection  from "../../components/Core/LearningLanguageSection";
-
+import  Faq from "../../components/Core/Faq.jsx";
 
 // import "./index.css";
 import {FaArrowRight} from "react-icons/fa"
@@ -20,6 +20,8 @@ import videoUrl from "../../assets/images/video.mp4";
 import { serverUnauth } from "../../helpers/apiCall";
 
 import { useNavigate } from "react-router-dom";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 const HomePage = () => {
   const navigate = useNavigate();
   const myRef = useRef(null);
@@ -30,6 +32,11 @@ const HomePage = () => {
       opacity: 0,
       y: "-30%",
     });
+
+    AOS.init({ duration: 1200, delay: 500 });
+    AOS.refresh();
+
+
   }, []);
 
   return (
@@ -215,7 +222,12 @@ const HomePage = () => {
 <h2 className='text-center text-4xl font-semobold mt-10'></h2>
 {/* Review Slider here */}
 </div>
-
+<section className="our-achievements mx-16 mt-12 mb-16">
+         
+         <div data-aos="fade-right" data-aos-delay="400" className="bg-richblack-5">
+           <Faq/>
+         </div>
+         </section>
 
 {/*Footer */}
 <Footer />
