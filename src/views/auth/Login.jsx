@@ -47,12 +47,13 @@ const Login = () => {
         values.email = values.username;
         delete values.username;
       }
+      // console.log(values);
       const response = await login(values);
+      // console.log(response);
       const { status } = response;
       if (status >= 200 && status < 300) {
         delete response?.data?.user?.encrypted_password;
         dispatch(setUser(response?.data?.user));
-        localStorage.setItem("authToken", response?.data?.token);
         navigate("/dashboard");
         toast.success("Login Was Success");
       }

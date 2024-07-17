@@ -5,7 +5,6 @@
 //   return (
 //     <>
 
-
 //     <button
 //         data-drawer-target="default-sidebar"
 //         data-drawer-toggle="default-sidebar"
@@ -130,18 +129,11 @@
 //               </a>
 //             </li>
 
-            
-
 //           </ul>
 //         </div>
 
-
-
-
 //   </aside>
 
- 
-  
 // </>
 //   );
 // };
@@ -155,7 +147,7 @@ const DashboardSidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { href: "/dashboard1", label: "Dashboard" },
+    { href: "/dashboard", label: "Dashboard" },
     { href: "/profile", label: "Profile" },
     { href: "/clubs", label: "Clubs" },
     { href: "/socities", label: "Socities" },
@@ -201,7 +193,7 @@ const DashboardSidebar = () => {
                   className={`flex items-center p-2 rounded-lg ${
                     location.pathname === item.href
                       ? "bg-white text-black"
-                      : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                      : "text-gray-400 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}
                 >
                   <svg
@@ -226,4 +218,3 @@ const DashboardSidebar = () => {
 };
 
 export default DashboardSidebar;
-
