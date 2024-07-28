@@ -12,6 +12,8 @@ const applicationController = require("../controllers/applicationController");
 
 const authController = require("../controllers/auth");
 
+// router.use(authController.isLoggedIn);
+
 router.post(
     "/",
     authController.protect,

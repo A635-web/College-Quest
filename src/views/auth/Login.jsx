@@ -6,15 +6,13 @@ import { toast } from "react-toastify";
 
 import CustomValidationErrorMessage from "../../components/errors/CustomValidationErrorMessage";
 import Loader from "../../components/loader/index";
-import { login } from "../../services/authService";
 import AuthLayout from "../layout/AuthLayout";
 import AppLogo from "../../components/images/AppLogo";
 import image from "../../assets/images/login.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setUser } from "../../store/actions/userActions";
-import { getAuthToken } from "../../helpers/auth";
 import { useSelector } from "react-redux";
+import { useAuth } from "../../contexts/AuthContext";
 
 const loginValidation = Yup.object({
   username: Yup.string().required("This field is Required"),
@@ -24,18 +22,12 @@ const loginValidation = Yup.object({
 });
 
 const Login = () => {
+  const { login, isAuthenticated } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const appInApp = useSelector((state) => state.appInApp.appInApp);
 
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const authToken = getAuthToken();
-    if (authToken?.length) {
-      navigate("/dashboard");
-    }
-  }, []);
 
   const handleLogin = async (values, resetForm) => {
     setLoading(true);
@@ -48,15 +40,17 @@ const Login = () => {
         delete values.username;
       }
       // console.log(values);
-      const response = await login(values);
+      const res = await login(values);
+      console.log(res);
+
       // console.log(response);
-      const { status } = response;
-      if (status >= 200 && status < 300) {
-        delete response?.data?.user?.encrypted_password;
-        dispatch(setUser(response?.data?.user));
-        navigate("/dashboard");
-        toast.success("Login Was Success");
-      }
+      //   if (status >= 200 && status < 300) {
+      //     delete response?.data?.user?.encrypted_password;
+      //     dispatch(setUser(response?.data?.user));
+      //     navigate("/dashboard");
+      if (res.status === 200) toast.success(res.data.message);
+      else toast.error(res.data.message);
+      //   }
     } catch (err) {
       console.error("Error : ", err);
       toast.error(err?.response?.data?.error || "Something went Wrong");
@@ -64,6 +58,12 @@ const Login = () => {
     setLoading(false);
     resetForm();
   };
+  useEffect(
+    function () {
+      if (isAuthenticated) navigate("/dashboard", { replace: true });
+    },
+    [isAuthenticated, navigate]
+  );
   return (
     <>
       <AuthLayout

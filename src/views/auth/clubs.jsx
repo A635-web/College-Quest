@@ -1,6 +1,4 @@
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import Header from "../../components/shared/Header";
 import Card from "../../components/Core/Card";
 import Footer from "../../components/shared/Footer";
@@ -9,22 +7,23 @@ import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import robotics from "../../assets/images/clubs.jpg";
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import Shimmer from "../../components/common/shimmer.jsx"
+import AOS from "aos";
+import "aos/dist/aos.css";
+import Shimmer from "../../components/common/shimmer.jsx";
 import Faq from "../../components/Core/Faq.jsx";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 const DashboardComponent = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state?.user);
-  const [loading, setLoading] = useState(true); 
+  // const user = useSelector((state) => state?.user);1
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     AOS.init({ duration: 1200, delay: 500 });
     AOS.refresh();
 
-   
     setTimeout(() => {
-      setLoading(false); 
+      setLoading(false);
     }, 2000);
   }, []);
 
@@ -39,8 +38,10 @@ const DashboardComponent = () => {
             </h2>
           </div>
           <Outlet />
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-10 mx-6"> {}
-            {loading ? ( 
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-10 mx-6">
+            {" "}
+            {}
+            {loading ? (
               <>
                 <div data-aos="fade-up">
                   <Shimmer /> {}
@@ -62,7 +63,9 @@ const DashboardComponent = () => {
                 </div>
               </>
             ) : (
-              <> {}
+              <>
+                {" "}
+                {}
                 <div data-aos="fade-left">
                   <Card
                     imageUrl={robotics}
@@ -113,16 +116,13 @@ const DashboardComponent = () => {
                 </div>
               </>
             )}
-            
           </div>
         </div>
         <section className="our-achievements mx-16 mt-12 mb-16">
-         
-         <div>
-           <Faq/>
-         </div>
-         </section>
-
+          <div>
+            <Faq />
+          </div>
+        </section>
 
         <Footer />
       </div>
@@ -131,8 +131,3 @@ const DashboardComponent = () => {
 };
 
 export default DashboardComponent;
-
-
-
-
-

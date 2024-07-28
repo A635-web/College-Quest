@@ -13,12 +13,14 @@ import { State, City } from "country-state-city";
 import { setUser } from "../../store/actions/userActions";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
-import CTAButton from "../../components/Core/Button"
+import CTAButton from "../../components/Core/Button";
+import { useAuth } from "../../contexts/AuthContext";
 const editProfileValidation = Yup.object({});
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state?.user);
+  // const user = useSelector((state) => state?.user);
+  const { user } = useAuth();
   //  console.log(user);
   const [edit, setEdit] = useState(false);
   const [img, setImg] = useState([]);
@@ -43,7 +45,7 @@ const Profile = () => {
       .then((res) => {
         toast.success(res?.data?.message);
         dispatch(setUser(res?.data?.data));
-        setEdit(false)
+        setEdit(false);
       })
       .catch((err) => {
         toast.error(err?.response?.data?.error);
@@ -141,9 +143,9 @@ const Profile = () => {
                   </div>
                   <div>
                     <h1 className="text-gray-500">Go to DashBoard</h1>
-                    <CTAButton active={true} linkto={"/dashboard"}> 
-                DashBoard
-            </CTAButton>
+                    <CTAButton active={true} linkto={"/dashboard"}>
+                      DashBoard
+                    </CTAButton>
                     {/* <input
                       disabled={true}
                       className={`w-full font-semibold text-lg bg-transparent p-1 rounded-md focus:outline-primary`}
@@ -281,9 +283,7 @@ const Profile = () => {
                           <option value="" disabled>
                             Select
                           </option>
-                          <option value={1}>
-                            Indian
-                          </option>
+                          <option value={1}>Indian</option>
                           <option value={2}>Other</option>
                         </select>
                       </div>

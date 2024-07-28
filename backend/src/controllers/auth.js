@@ -38,15 +38,14 @@ const signup = catchAsync(async (req, res, next) => {
     expiresIn: 7776000000,
   });
   res.cookie("jwt", token, {
-    // httpOnly: true,
-    secure: false,
+    maxAge: 90 * 86400 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
   });
   return res.status(201).json({
     status: "success",
     token,
-    data: {
-      newUser,
-    },
+    user: newUser,
   });
 });
 
@@ -74,10 +73,8 @@ const signin = catchAsync(async (req, res, next) => {
   }
 
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: 90 * 86400 * 1000, // Make sure this is set correctly
+    expiresIn: 90 * 86400 * 1000,
   });
-
-  console.log(token);
 
   res.cookie("jwt", token, {
     maxAge: 90 * 86400 * 1000,
@@ -96,8 +93,12 @@ const signin = catchAsync(async (req, res, next) => {
 });
 
 const signout = (_, res) => {
-  res.clearCookie("Token");
-  res.status(SC.OK).json({
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: "success",
     message: "User Signed Out Sucessfully!",
   });
 };
@@ -183,15 +184,14 @@ const updateRole = catchAsync(async (req, res, next) => {
   let user = await userModel.findById(req.params.id);
   let club = await Club.findById(req.params.clubId);
   if (!user) next(new AppError("No user found with that ID", 404));
-  if (!user.clubs.includes(club._id)) {
-    const newClubs = user.clubs;
-    newClubs.push(club._id);
-    await userModel.findByIdAndUpdate(
-      user._id,
-      { clubs: newClubs },
-      { new: true, runValidators: true }
-    );
-  }
+  let newClubs = user.clubs;
+  newClubs = [club._id];
+  await userModel.findByIdAndUpdate(
+    user._id,
+    { clubs: newClubs },
+    { new: true, runValidators: true }
+  );
+
   const currentRole = user.role;
   if (currentRole === role) {
     return next(new AppError(`User is already a ${role}.`, 404));
@@ -239,6 +239,24 @@ const update = catchAsync(async (req, res, next) => {
   });
 });
 
+const isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+
+    const currentUser = await userModel.findById(decoded._id);
+    if (!currentUser) return next();
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+    res.locals.user = currentUser;
+    next();
+  }
+  next();
+});
+
 const protect = catchAsync(async (req, res, next) => {
   const token = req.cookies.jwt;
   if (!token) {
@@ -248,8 +266,9 @@ const protect = catchAsync(async (req, res, next) => {
   }
 
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-
-  const freshUser = await userModel.findById(decoded._id);
+  console.log(decoded);
+  const freshUser = await userModel.findById(decoded.id || decoded._id);
+  console.log(freshUser);
   if (!freshUser) {
     return next(new AppError("User does not exist", 401));
   }
@@ -298,6 +317,7 @@ module.exports = {
   updateRole,
   update,
   protect,
+  isLoggedIn,
   restrictTo,
   getStudentClubs,
 };
