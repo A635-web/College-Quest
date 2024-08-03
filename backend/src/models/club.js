@@ -1,31 +1,44 @@
-const mongoose=require("mongoose");
+const mongoose = require("mongoose");
 
-const clubSchema=new mongoose.Schema(
-   
-    {
-        CoordinatorName: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'user', // Reference to the User model
-            required: true
-        },
+const clubSchema = new mongoose.Schema({
+    coordinator: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Reference to the User model
+    },
+    clubName: {
+        type: String,
+        required: true,
+        trim: true,
+        unique: true,
+    },
+    members: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    }, ],
+    studentsApplied: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    }, ],
+    coverImage: {
+        type: String,
+    },
+    mainImage: {
+        type: String,
+    },
+    acceptingStudents: {
+        type: Boolean,
+        default: false,
+    },
+    upcomingEvents: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Event",
+    }, ],
+    perks: [{
+        type: String,
+    }, ],
+    achievements: [{
+        type: String,
+    }, ],
+}, { timestamps: true });
 
-        clubName:{
-            type:String,
-            required:true,
-            trim:true,
-        },
-        recruitment: {
-            type: Boolean,
-            default: false,
-            required:true,
-        },
-        upcomingEvent:{
-            type:String,
-
-        }
-        
-    }
-
-
-
-)
+module.exports = mongoose.model("Club", clubSchema);

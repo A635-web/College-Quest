@@ -10,13 +10,14 @@ import {
 } from "@heroicons/react/outline";
 import { clearAuth, getAuthToken } from "../../helpers/auth";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../../store/actions/userActions";
+// import { logout } from "../../store/actions/userActions";
 import { useDispatch } from "react-redux";
 import { LibraryIcon } from "@heroicons/react/outline";
 import { BellIcon } from "@heroicons/react/outline";
 import { DocumentTextIcon } from "@heroicons/react/outline";
 import { InformationCircleIcon } from "@heroicons/react/outline";
 import { useSelector } from "react-redux";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -24,7 +25,8 @@ const Header = () => {
 
   const [open, setOpen] = useState(false);
 
-  const user = useSelector((state) => state?.user);
+  // const user = useSelector((state) => state?.user);
+  const { user, logout } = useAuth();
 
   return (
     <div className={`bg-white duration-500`} style={{ zIndex: 999 }}>
@@ -34,25 +36,22 @@ const Header = () => {
             <AppLogo width="50" height="50" classname="rounded-full" />
           </a>
           <nav class="md:ml-auto flex flex-wrap items-center justify-center text-secondary text-lg gap-8 mx-6">
-          <Link to={"/"}>
-          <a class=" hover:text-secondary border-b-2 border-white hover:border-secondary duration-300">
-              Home
-            </a>
-          </Link>
-          
-          <Link to={"/About"}>
-          <a class=" hover:text-secondary border-b-2 border-white hover:border-secondary duration-300">
-              About
-            </a>
-          </Link>
-          
+            <Link to={"/"}>
+              <a class=" hover:text-secondary border-b-2 border-white hover:border-secondary duration-300">
+                Home
+              </a>
+            </Link>
+
+            <Link to={"/About"}>
+              <a class=" hover:text-secondary border-b-2 border-white hover:border-secondary duration-300">
+                About
+              </a>
+            </Link>
+
             <Link to={"/contact-us"}>
-            <a class=" hover:text-secondary border-b-2 border-white hover:border-secondary duration-300">
-         
-                     
-                     
-              Contact Us
-            </a>
+              <a class=" hover:text-secondary border-b-2 border-white hover:border-secondary duration-300">
+                Contact Us
+              </a>
             </Link>
           </nav>
           <div className="flex gap-3">
@@ -96,8 +95,7 @@ const Header = () => {
             ) : (
               <button
                 onClick={() => {
-                  dispatch(logout());
-                  clearAuth();
+                  logout();
                   navigate("/");
                 }}
                 class="inline-flex items-center bg-secondary border-0 py-1 px-3 focus:outline-none hover:bg-primary rounded text-base mt-4 md:mt-0 text-white font-semibold duration-200"
@@ -115,16 +113,7 @@ const Header = () => {
                   <path d="M5 12h14M12 5l7 7-7 7"></path>
                 </svg>
               </button>
-            )
-
-          
-
-            
-            
-            
-            
-            
-            }
+            )}
           </div>
         </div>
       </header>
@@ -153,6 +142,7 @@ export default Header;
 
 const DrawerMenu = ({ openModal, closeModal, navigate }) => {
   const dispatch = useDispatch();
+  const { user, logout } = useAuth();
 
   return (
     <Transition show={openModal} as={Fragment}>
@@ -240,8 +230,7 @@ const DrawerMenu = ({ openModal, closeModal, navigate }) => {
                     <button
                       className="my-4 flex gap-2 items-center"
                       onClick={() => {
-                        dispatch(logout());
-                        clearAuth();
+                        logout();
                         navigate("/");
                       }}
                     >

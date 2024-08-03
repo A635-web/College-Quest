@@ -1,6 +1,5 @@
-import {
-    SET_USER, LOGOUT
-} from '../actionTypes/index';
+import { SET_USER, LOGOUT } from "../actionTypes/index";
+import { signout } from "../../services/authService";
 
 export const setUser = (user) => ({
     type: SET_USER,
@@ -9,6 +8,8 @@ export const setUser = (user) => ({
     },
 });
 
-export const logout = (user) => ({
-    type: LOGOUT,
-});
+export const logout = async() => {
+    setUser(null);
+    const response = await signout();
+    return response;
+};

@@ -1,132 +1,107 @@
-const userModel = require('../models/user.js')
-const jwt = require('jsonwebtoken')
-const { validationResult: validate } = require('express-validator')
-const { statusCode: SC } = require('../utils/statusCode')
-const { loggerUtil: logger, loggerUtil } = require('../utils/logger')
-const formidable = require('formidable')
-const { createSiteData } = require('../helpers/fileHelper.js')
+// const { ApiError } = require("../utils/ApiError.js");
+const { promisify } = require("util");
+const userModel = require("../models/user.js");
+const jwt = require("jsonwebtoken");
+const { validationResult: validate } = require("express-validator");
+const { statusCode: SC } = require("../utils/statusCode");
+const { loggerUtil: logger, loggerUtil } = require("../utils/logger");
+const formidable = require("formidable");
+const { createSiteData } = require("../helpers/fileHelper.js");
+const AppError = require("../utils/appError.js");
+const catchAsync = require("../utils/catchAsync.js");
+const Club = require("../models/club.js");
 
+const signup = catchAsync(async (req, res, next) => {
+  const errors = validate(req) || [];
+  if (!errors.isEmpty()) {
+    return res.status(SC.WRONG_ENTITY).json({
+      status: SC.WRONG_ENTITY,
+      error: errors.array()[0]?.msg,
+    });
+  }
+  const { email, phoneNumber } = req.body;
+  const existingUser = await userModel.findOne({
+    $or: [{ email: email }, { phoneNumber: phoneNumber }],
+  });
+  if (existingUser) {
+    console.log(existingUser);
+    return next(
+      new AppError(
+        "User already exists with that email id or phone number",
+        404
+      )
+    );
+  }
+  req.body.role = "student";
+  const newUser = await userModel.create(req.body);
+  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+    expiresIn: 7776000000,
+  });
+  res.cookie("jwt", token, {
+    maxAge: 90 * 86400 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  });
+  return res.status(201).json({
+    status: "success",
+    token,
+    user: newUser,
+  });
+});
 
+const signin = catchAsync(async (req, res, next) => {
+  const errors = validate(req);
+  if (!errors.isEmpty()) {
+    return res.status(SC.WRONG_ENTITY).json({
+      error: errors.array()[0].msg,
+    });
+  }
 
-const signup = async (req, res) => {
-	const errors = validate(req) || []
-	if (!errors.isEmpty()) {
-		return res.status(SC.WRONG_ENTITY).json({
-			status: SC.WRONG_ENTITY,
-			error: errors.array()[0]?.msg
-		})
-	}
-	const { email, phoneNumber } = req.body
-	try {
-		userModel.find({
-			$or: [
-				{ email: email },
-				{ phoneNumber: phoneNumber }
-			]
-		}).then((initialUser) => {
-			if (initialUser.length !== 0) {
-				return res.status(SC.BAD_REQUEST).json({
-					status: SC.BAD_REQUEST,
-					error: "Email or Phone Number already registered."
-				});
-			}
+  const { email, phoneNumber, password } = req.body;
+  const body = req.body;
+  delete body.password;
+  const user = await userModel.findOne({ ...body });
 
-			const user = new userModel(req.body)
-			console.log(user);
-			user.save().then(user => {
-				const expiryTime = new Date()
-				expiryTime.setMonth(expiryTime.getMonth() + 6)
-				const exp = parseInt(expiryTime.getTime() / 1000)
-				const token = jwt.sign(
-					{ _id: user._id, exp: exp },
-					process.env.SECRET || 'college-predictor'
-				)
-				res.cookie('Token', token, { expire: new Date() + 9999 })
-				user.salt = undefined
-				user.__v = undefined
+  if (!user) {
+    return next(
+      new AppError("No user exists with given email id/password", 404)
+    );
+  }
 
-				res.status(SC.OK).json({
-					status: SC.OK,
-					message: "User Registered Successfully.",
-					token,
-					data: user
-				})
-			}).catch(err => res.status(SC.BAD_REQUEST).json({
-				status: SC.BAD_REQUEST,
-				message: err.message
-			}));
-		}).catch(err => {
-			return res.status(SC.BAD_REQUEST).json({
-				status: SC.BAD_REQUEST,
-				error: "Something Went wrong",
-				err: err
-			})
-		})
-	} catch (err) {
-		logger(err, 'ERROR')
-	} finally {
-		logger(`Sign up API called by user - ${email} , ${phoneNumber}, ${req?.body?.password}`)
-	}
-}
+  if (!user.authenticate(password)) {
+    return next(new AppError("Invalid credentials", 401));
+  }
 
-const signin = async (req, res) => {
-	const errors = validate(req)
-	if (!errors.isEmpty()) {
-		return res.status(SC.WRONG_ENTITY).json({
-			error: errors.array()[0].msg
-		})
-	}
-	const { email, phoneNumber, password } = req.body
-	const body = req.body
-	delete body.password
-	try {
-		await userModel.findOne({ ...body }).then((user) => {
-			if (!user) {
-				return res.status(SC.NOT_FOUND).json({
-					error: "Phone Number or E-mail doesn't exist in DB!"
-				})
-			}
-			if (!user.authenticate(password)) {
-				return res.status(SC.UNAUTHORIZED).json({
-					error: 'Oops!, Phone Number / E-mail and Password does not match!'
-				})
-			}
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: 90 * 86400 * 1000,
+  });
 
-			const expiryTime = new Date()
-			expiryTime.setMonth(expiryTime.getMonth() + 6)
-			const exp = parseInt(expiryTime.getTime() / 1000)
-			const token = jwt.sign(
-				{ _id: user._id, exp: exp },
-				process.env.SECRET || 'college-solution'
-			)
-			res.cookie('Token', token, { expire: new Date() + 9999 })
-			user.salt = undefined
-			user.__v = undefined
-			return res.status(SC.OK).json({
-				message: 'User Logged in Successfully!',
-				token,
-				user
-			})
-		}).catch((err) => {
-			if (err) {
-				return res.status(SC.BAD_REQUEST).json({
-					error: "Something went wrong!"
-				})
-			}
-		})
-	} catch (err) {
-		logger(err, 'ERROR')
-	} finally {
-		logger(`User Signed in - ${email} , ${phoneNumber}`)
-	}
-}
+  res.cookie("jwt", token, {
+    maxAge: 90 * 86400 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  user.salt = undefined;
+  user.__v = undefined;
+
+  return res.status(200).json({
+    message: "User Logged in Successfully!",
+    token,
+    user,
+  });
+});
 
 const signout = (_, res) => {
-	res.clearCookie('Token')
-	res.status(SC.OK).json({
-		message: 'User Signed Out Sucessfully!'
-	})
-}
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: "success",
+    message: "User Signed Out Sucessfully!",
+  });
+};
 
 // const forgotPassword = async (req, res) => {
 // 	try {
@@ -204,109 +179,145 @@ const signout = (_, res) => {
 // 	}
 // }
 
-const updateRole = async (req, res) => {
-	try {
-		const userId = req.params.id
-		const role = req.query.role_id
-		console.log(userId, role, "hello world");
-		await userModel.findOne({ _id: userId }).then((data) => {
-			if (!data) {
-				return res.status(SC.NOT_FOUND).json({
-					error: 'User Not Found!'
-				})
-			}
-			userModel
-				.findByIdAndUpdate(
-					{ _id: userId },
-					{
-						$set: { role }
-					}, { new: true }
-				)
-				.then((user) => {
-					res.status(SC.OK).json({
-						message: 'User Updated Successfully!',
-						data: user
-					})
-				})
-				.catch(err => {
-					res.status(SC.INTERNAL_SERVER_ERROR).json({
-						error: 'User Updation Failed!'
-					})
-					logger(err, 'ERROR')
-				})
-		}).catch(err => {
-			res.status(SC.INTERNAL_SERVER_ERROR).json({
-				error: 'User Updation Failed!'
-			})
-			logger(err, 'ERROR')
-		})
-	} catch (err) {
-		logger(err, 'ERROR')
-	} finally {
-		logger('User Update Function is Executed')
-	}
-}
+const updateRole = catchAsync(async (req, res, next) => {
+  const role = req.body.role;
+  let user = await userModel.findById(req.params.id);
+  let club = await Club.findById(req.params.clubId);
+  if (!user) next(new AppError("No user found with that ID", 404));
+  let newClubs = user.clubs;
+  newClubs = [club._id];
+  await userModel.findByIdAndUpdate(
+    user._id,
+    { clubs: newClubs },
+    { new: true, runValidators: true }
+  );
 
-const update = async (req, res) => {
-	try {
-		const id = req.auth._id
-	
-		const form = new formidable.IncomingForm()
-		form.parse(req, async (err, fields, file) => {
-			const formValue = JSON.parse(fields.data)
-			if (file.profileImage) {
-				formValue.profileImage = await createSiteData(file.profileImage, res, err)
-			} const { email, password } = formValue
-			if (email || password) {
-				return res.status(SC.BAD_REQUEST).json({
-					error: 'Cannot update email or password'
-				})
-			}
-			await userModel.findOne({ _id: id }).then((data) => {
-				if (!data) {
-					console.log(data);
-					return res.status(SC.NOT_FOUND).json({
-						error: 'User Not Found!'
-					})
-				}
-				userModel
-					.findByIdAndUpdate(
-						{ _id: id },
-						{
-							$set: formValue
-						}, { new: true }
-					)
-					.then((user) => {
-						res.status(SC.OK).json({
-							message: 'User Updated Successfully!',
-							data: user
-						})
-					})
-					.catch(err => {
-						res.status(SC.INTERNAL_SERVER_ERROR).json({
-							error: 'User Updation Failed!'
-						})
-						logger(err, 'ERROR')
-					})
-			}).catch(err => {
-				res.status(SC.INTERNAL_SERVER_ERROR).json({
-					error: 'User Updation Failed!'
-				})
-				logger(err, 'ERROR')
-			})
-		})
-	} catch (err) {
-		logger(err, 'ERROR')
-	} finally {
-		logger('User Update Function is Executed')
-	}
-}
+  const currentRole = user.role;
+  if (currentRole === role) {
+    return next(new AppError(`User is already a ${role}.`, 404));
+  } else {
+    // user.updateOne()
+    user = await userModel.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    const members = club.members;
+    if (!members.includes(user._id)) members.push(user);
+    club = await Club.findByIdAndUpdate(
+      req.params.clubId,
+      { coordinator: user, members: members },
+      { new: true, runValidators: true }
+    );
+    res.status(200).json({
+      status: "success",
+      data: {
+        user,
+        club,
+      },
+    });
+  }
+});
+
+const update = catchAsync(async (req, res, next) => {
+  let user = await userModel.findById(req.params.id);
+  const currentUser = req.user;
+  if (!user) {
+    return next(new AppError("No user found with that ID", 404));
+  }
+  if (user.email !== currentUser.email) {
+    return next(new AppError("You are not authorized for this action", 403));
+  }
+  user = await userModel.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidator: true,
+  });
+  res.status(200).json({
+    status: "success",
+    data: {
+      user,
+    },
+  });
+});
+
+const isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+
+    const currentUser = await userModel.findById(decoded._id);
+    if (!currentUser) return next();
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+    res.locals.user = currentUser;
+    next();
+  }
+  next();
+});
+
+const protect = catchAsync(async (req, res, next) => {
+  const token = req.cookies.jwt;
+  if (!token) {
+    return next(
+      new AppError("You are not logged in! Please log in to get access", 401)
+    );
+  }
+
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  console.log(decoded);
+  const freshUser = await userModel.findById(decoded.id || decoded._id);
+  console.log(freshUser);
+  if (!freshUser) {
+    return next(new AppError("User does not exist", 401));
+  }
+  if (freshUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError(
+        "User recently changed his password. Please log in again!",
+        401
+      )
+    );
+  }
+  req.user = freshUser;
+  next();
+});
+
+const restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You don't have permission to perform this action", 403)
+      );
+    }
+    next();
+  };
+};
+
+const getStudentClubs = catchAsync(async (req, res, next) => {
+  const clubIds = req.user.clubs;
+  let clubs = [];
+  for (const clubId of clubIds) {
+    const club = await Club.findById(clubId);
+    clubs.push(club);
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      clubs,
+    },
+  });
+});
 
 module.exports = {
-	signup,
-	signin,
-	signout,
-	updateRole,
-	// forgotPassword
-	update
-}
+  signup,
+  signin,
+  signout,
+  updateRole,
+  update,
+  protect,
+  isLoggedIn,
+  restrictTo,
+  getStudentClubs,
+};

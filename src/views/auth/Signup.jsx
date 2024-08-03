@@ -21,6 +21,7 @@ import { phoneCodes } from "../../helpers/phoneNumberCode";
 import { getAuthToken } from "../../helpers/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../store/actions/userActions";
+import { useAuth } from "../../contexts/AuthContext";
 
 const signUpalidation = Yup.object({
   name: Yup.string()
@@ -39,14 +40,15 @@ const signUpalidation = Yup.object({
   examType: Yup.number()
     .min(1, "Please Select a value")
     .required("Exam Type field is required"),
-    // branch:Yup.string()
-    // .email("Not added branch")
-    // .required(" Branch field is required"),
+  // branch:Yup.string()
+  // .email("Not added branch")
+  // .required(" Branch field is required"),
 });
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { signup, isAuthenticated } = useAuth();
 
   const dispatch = useDispatch();
 
@@ -65,37 +67,25 @@ const SignUp = () => {
       return;
     }
     setLoading(true);
-    // try {
-    //   const response = await sendOtp(
-    //     `${values.countryCode}${values.phoneNumber}`
-    //   );
-    //   const { status } = response;
-    //   if (status >= 200 && status < 300) {
-    //     toast.success(
-    //       `OTP Sent Succesfully to ${values.countryCode}${values.phoneNumber}`
-    //     );
-    //     navigate("/verify-otp", { state: { values } });
-    //   }
-    // } catch (err) {
-    //   console.error("Error : ", err);
     try {
-      const response = await signup(values);
-      const { status } = response;
-      if (status >= 200 && status < 300) {
-        dispatch(setUser(response?.data?.data));
-        localStorage.setItem("authToken", response?.data?.token);
-        navigate("/profile");
-        toast.success("Welcome to MNNIT Event Portal");
-      }
+      await signup(values);
+      // const { status } = response;
+      // navigate("/profile");
+      toast.success("Welcome to MNNIT Event Portal");
     } catch (err) {
       console.error("Error : ", err);
       toast.error(err?.response?.data?.error || "Something went Wrong");
     }
-    //   toast.error(err?.response?.data?.error || "Something went Wrong.");
 
-    // }
     setLoading(false);
   };
+
+  useEffect(
+    function () {
+      if (isAuthenticated) navigate("/dashboard", { replace: true });
+    },
+    [isAuthenticated, navigate]
+  );
 
   return (
     <>
