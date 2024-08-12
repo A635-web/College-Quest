@@ -32,7 +32,7 @@ const signup = catchAsync(async (req, res, next) => {
       )
     );
   }
-  req.body.role = "student";
+  // req.body.role = "student";
   const newUser = await userModel.create(req.body);
   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     expiresIn: 7776000000,
