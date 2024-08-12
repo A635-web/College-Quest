@@ -4,7 +4,7 @@ const token = getAuthToken();
 // axios.defaults.withCredentials = true;
 
 
-const BASE_URL ="http://localhost:8006/api/v1";
+const BASE_URL ="https://college-quest-1.onrender.com/api/v1";
 
 export const server = axios.create({
     baseURL: `${BASE_URL}`,
