@@ -51,7 +51,7 @@ function AuthProvider({ children }) {
     try {
       const res = await axios({
         method: "POST",
-        url: `${BASE_URL}`,
+        url: `${BASE_URL}/user/signup`,
         data: values,
         withCredentials: "true",
       });
@@ -67,7 +67,7 @@ function AuthProvider({ children }) {
     try {
       const res = await axios({
         method: "POST",
-        url: `${BASE_URL}`,
+        url: `${BASE_URL}/user/signin`,
         data: {
           email,
           password,
@@ -84,7 +84,7 @@ function AuthProvider({ children }) {
     try {
       const res = await axios({
         method: "GET",
-        url: `${BASE_URL}`,
+        url: `${BASE_URL}/user/signout`,
         withCredentials: "true",
       });
       dispatch({ type: "logout" });
