@@ -1,12 +1,12 @@
 import axios from "axios";
 axios.defaults.withCredentials = true;
-
+const BASE_URL ="https://college-quest-1.onrender.com/api/v1";
 export const createApplication = async (values) => {
   const { reason, portfolio, clubId } = values;
   try {
     const res = await axios({
       method: "POST",
-      url: `http://localhost:8006/api/v1/clubs/${clubId}/applications/create`,
+      url: `${BASE_URL}/clubs/${clubId}/applications/create`,
       data: {
         reason,
         portfolio,
@@ -25,7 +25,7 @@ export const acceptApplication = async (values) => {
     // console.log(clubId, applicationId);
     const res = await axios({
       method: "POST",
-      url: `http://localhost:8006/api/v1/clubs/${clubId}/applications/${applicationId}`,
+      url: `${BASE_URL}/clubs/${clubId}/applications/${applicationId}`,
     });
     return res;
   } catch (err) {
@@ -39,7 +39,7 @@ export const rejectApplication = async (values) => {
   try {
     const res = await axios({
       method: "DELETE",
-      url: `http://localhost:8006/api/v1/clubs/${clubId}/applications/${applicationId}`,
+      url: `${BASE_URL}/clubs/${clubId}/applications/${applicationId}`,
     });
     return res;
   } catch (err) {

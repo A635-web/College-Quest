@@ -10,7 +10,7 @@ export const server = axios.create({
     baseURL: `${BASE_URL}`,
     timeout: 600000,
     headers: {
-        "Access-Control-Allow-Origin": process.env.REACT_APP_BASE_URL || "https://college-quest.vercel.app",
+        "Access-Control-Allow-Origin": process.env.REACT_APP_BASE_URL,
         "Cache-Control": "no-cache",
         Pragma: "no-cache",
         Expires: "0",

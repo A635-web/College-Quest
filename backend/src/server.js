@@ -21,7 +21,7 @@ const app = express();
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "*",
+    origin: "https://college-quest.vercel.app",
     credentials: true,
   })
 );

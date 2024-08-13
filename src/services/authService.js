@@ -1,7 +1,7 @@
 import { serverUnauth } from "../helpers/apiCall";
 import axios from "axios";
 axios.defaults.withCredentials = true;
-
+const BASE_URL ="https://college-quest-1.onrender.com/api/v1";
 export const sendOtp = async(phoneNumber) =>
     await new Promise((resolve, reject) => {
         serverUnauth
@@ -18,7 +18,7 @@ export const signout = async() => {
     try {
         const res = await axios({
             method: "GET",
-            url: "http://localhost:8006/api/v1/user/signout",
+            url: `${BASE_URL}`,
         });
         return res;
     } catch (err) {
@@ -50,7 +50,7 @@ export const login = async(values) => {
     try {
         const res = await axios({
             method: "POST",
-            url: "http://localhost:8006/api/v1/user/signin",
+            url: `${BASE_URL}/user/signin`,
             data: {
                 email,
                 password,

@@ -2,7 +2,7 @@ import { createContext, useContext, useReducer } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 axios.defaults.withCredentials = true;
-
+const BASE_URL ="https://college-quest-1.onrender.com/api/v1";
 const AuthContext = createContext();
 const initialState = {
   user: null,
@@ -51,7 +51,7 @@ function AuthProvider({ children }) {
     try {
       const res = await axios({
         method: "POST",
-        url: "http://localhost:8006/api/v1/user/signup",
+        url: `${BASE_URL}`,
         data: values,
         withCredentials: "true",
       });
@@ -67,7 +67,7 @@ function AuthProvider({ children }) {
     try {
       const res = await axios({
         method: "POST",
-        url: "http://localhost:8006/api/v1/user/signin",
+        url: `${BASE_URL}`,
         data: {
           email,
           password,
@@ -84,7 +84,7 @@ function AuthProvider({ children }) {
     try {
       const res = await axios({
         method: "GET",
-        url: "http://localhost:8006/api/v1/user/signout",
+        url: `${BASE_URL}`,
         withCredentials: "true",
       });
       dispatch({ type: "logout" });
