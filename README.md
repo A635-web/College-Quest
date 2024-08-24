@@ -1,70 +1,109 @@
-# Getting Started with Create React App
+College Club Application System
+Overview
+The College Club Application System is a web application designed to streamline the process of applying to college clubs. Built using the MERN stack (MongoDB, Express.js, React, Node.js), it enables students to easily apply to clubs and allows coordinators to manage applications efficiently.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Features
+User Authentication: Secure signup and login using JWT.
+Student Dashboard: View available clubs and submit applications.
+Coordinator Dashboard: Manage club applications with options to accept or reject.
+Concurrency Handling: Pessimistic locking mechanism to ensure data integrity during concurrent operations.
+Scalable Design: Optimized to handle the data of 4000+ students.
+Tech Stack
+Frontend: React.js
+Responsive UI for students and coordinators.
+State management with React Hooks.
+Backend: Node.js with Express.js
+RESTful APIs for handling data flow.
+JWT-based authentication for secure access.
+Database: MongoDB
+Flexible schema design to store users, clubs, and applications.
+Pessimistic locking to manage concurrent operations.
+Others:
+Axios for API requests.
+Mongoose for MongoDB object modeling.
+Installation
+Clone the repository:
 
-## Available Scripts
+bash
+Copy code
+git clone https://github.com/your-username/college-club-application-system.git
+cd college-club-application-system
+Install dependencies:
 
-In the project directory, you can run:
+bash
+Copy code
+npm install
+cd client
+npm install
+cd ..
+Set up environment variables: Create a .env file in the root directory and add the following:
 
-### `npm start`
+plaintext
+Copy code
+PORT=5000
+MONGO_URI=your_mongo_db_connection_string
+JWT_SECRET=your_jwt_secret
+Run the application:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+bash
+Copy code
+# Run backend
+npm run server
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# Run frontend
+cd client
+npm start
+Access the application:
 
-### `npm test`
+Visit http://localhost:3000 for the frontend.
+Backend runs on http://localhost:5000.
+Usage
+Student Workflow
+Sign up and log in.
+View available clubs on the dashboard.
+Apply to clubs by filling out the application form.
+Track the status of your applications.
+Coordinator Workflow
+Log in with coordinator credentials.
+View all applications submitted to your club.
+Accept or reject applications.
+Manage club information.
+Database Schema
+Users Collection:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+name: String
+email: String
+password: String (hashed)
+role: String ("student" or "coordinator")
+Clubs Collection:
 
-### `npm run build`
+name: String
+coordinatorId: ObjectId (Reference to Users)
+description: String
+Applications Collection:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+studentId: ObjectId (Reference to Users)
+clubId: ObjectId (Reference to Clubs)
+status: String ("pending", "accepted", "rejected")
+locked: Boolean
+lockedBy: ObjectId (Reference to Users)
+lockedAt: Date
+Pessimistic Locking Implementation
+To ensure data integrity during concurrent operations, a pessimistic locking mechanism is used. This is achieved by adding a locked field in the Applications collection to prevent multiple coordinators from modifying the same application simultaneously.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Challenges Faced
+Scalability: Ensured that the system can handle data for 4000+ students.
+Concurrency Management: Implemented a custom locking mechanism to manage concurrent operations without conflicts.
+Authentication Security: Used JWT for secure user sessions and API protection.
+Future Prospects
+Notification System: Implement email or in-app notifications for application status updates.
+Enhanced Concurrency Handling: Explore more advanced concurrency controls, such as distributed locks.
+Mobile App Development: Extend the platform to mobile devices for broader accessibility.
+Contributing
+Contributions are welcome! Please follow these steps:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Fork the repository.
+Create a new branch: git checkout -b feature-name.
+Make your changes and commit: git commit -m 'Add some feature'.
+Push to the branch: git push origin feature-name.
+Submit a pull request.
