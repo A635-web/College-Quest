@@ -7,8 +7,7 @@ The College Club Application System is a web application designed to streamline 
 - **User Authentication**: Secure signup and login using JWT.
 - **Student Dashboard**: View available clubs and submit applications.
 - **Coordinator Dashboard**: Manage club applications with options to accept or reject.
-- **Concurrency Handling**: Pessimistic locking mechanism to ensure data integrity during concurrent operations.
-- **Scalable Design**: Optimized to handle the data of 4000+ students.
+- **Concurrency Handling**: Pessimistic locking mechanism to ensure data integrity during concurrent operations (future prospect)
 
 ### **Tech Stack**
 - **Frontend**: React.js
@@ -23,10 +22,3 @@ The College Club Application System is a web application designed to streamline 
 - **Others**:
   - **Axios** for API requests.
   - **Mongoose** for MongoDB object modeling.
-
-### **Installation**
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-username/college-club-application-system.git
-   cd college-club-application-system
